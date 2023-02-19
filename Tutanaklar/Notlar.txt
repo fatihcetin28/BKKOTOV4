@@ -1,0 +1,28 @@
+ and Izinler.BasTar<=cdate('25.10.2022') and Izinler.BitisTar>cdate('25.10.2022') Bunu
+1 -LEFT JOIN Izinler ON (AkaPersonel.Id = Izinler.PerId)) içindeki ON'un içine eklersin.
+
+2- and BolumBaskaniTakip.BasTarihi<=CDate('25.10.2022') and BolumBaskaniTakip.BitisTarihi>CDate('25.10.2022')
+
+
+ORDER BY İÇİN SUBQUERY OLUŞTURMA
+select *
+from (
+SELECT Unvanlar.Unvan, [AkaPersonel]![Ad] & " " & [AkaPersonel]![Soyad] AS AdSoyad, IIf(IsNull([BolumBaskaniTakip]![BaskanPerId]),"Üye","Başkan") AS UyeDurum, IIf(CDate('25.10.2022')>=[Izinler].[BasTar] And CDate('25.10.2022')<[Izinler].[BitisTar],[IzinTurleri].[ImzaTemsili],'') AS IzinDurum, Unvanlar.Id as UnvanId
+FROM (
+IzinTurleri RIGHT JOIN ((Bolumler INNER JOIN ((Unvanlar INNER JOIN (AkaPersonel INNER JOIN PerUnvanTakip ON AkaPersonel.Id = PerUnvanTakip.PerId) ON Unvanlar.Id = PerUnvanTakip.UnvanId) INNER JOIN AkaPerCalismaTakip ON AkaPersonel.Id = AkaPerCalismaTakip.PerId) ON Bolumler.Id = AkaPerCalismaTakip.BolumId) LEFT JOIN Izinler ON AkaPersonel.Id = Izinler.PerId) ON IzinTurleri.Id = Izinler.TurId) LEFT JOIN BolumBaskaniTakip ON AkaPersonel.Id = BolumBaskaniTakip.BaskanPerId
+WHERE ((([PerUnvanTakip]![BasTarihi])<=CDate('25.10.2022')) AND (([PerUnvanTakip]![BitisTarihi])>CDate('25.10.2022')) AND ((AkaPerCalismaTakip.BolumId)=2) AND ((AkaPerCalismaTakip.IseGirisT)<=CDate('25.10.2022')) AND ((AkaPerCalismaTakip.IstenCikisT)>CDate('25.10.2022')) AND ((PerUnvanTakip.UnvanId)<5))) as the
+order by the.UyeDurum, the.UnvanId;
+
+Buna Mevki-Mevki Takibi de join edip
+	subquery + ON ifadelerinin içini dolduracağız
+
+"select *
+from (
+SELECT Unvanlar.Unvan, [AkaPersonel]![Ad] & " " & [AkaPersonel]![Soyad] AS AdSoyad, IIf(IsNull([BolumBaskaniTakip]![BaskanPerId]),"Üye","Başkan") AS UyeDurum, IIf(CDate('25.10.2022')>=[Izinler].[BasTar] And CDate('25.10.2022')<[Izinler].[BitisTar],[IzinTurleri].[ImzaTemsili],'') AS IzinDurum, Unvanlar.Id, Mevkiler.Mevki
+FROM Mevkiler RIGHT JOIN (((IzinTurleri RIGHT JOIN ((Bolumler INNER JOIN ((Unvanlar INNER JOIN (AkaPersonel INNER JOIN PerUnvanTakip ON AkaPersonel.Id = PerUnvanTakip.PerId) ON Unvanlar.Id = PerUnvanTakip.UnvanId) INNER JOIN AkaPerCalismaTakip ON AkaPersonel.Id = AkaPerCalismaTakip.PerId) ON Bolumler.Id = AkaPerCalismaTakip.BolumId) LEFT JOIN Izinler ON (AkaPersonel.Id = Izinler.PerId and Izinler.BasTar<=cdate('25.10.2022') and Izinler.BitisTar>cdate('25.10.2022'))) ON IzinTurleri.Id = Izinler.TurId) LEFT JOIN BolumBaskaniTakip ON (AkaPersonel.Id = BolumBaskaniTakip.BaskanPerId  and BolumBaskaniTakip.BasTarihi<=CDate('25.10.2022') and BolumBaskaniTakip.BitisTarihi>CDate('25.10.2022'))) LEFT JOIN MevkiTakip ON AkaPersonel.Id = MevkiTakip.PerId) ON (Mevkiler.Id = MevkiTakip.MevkiId and MevkiTakip.BasTarihi<=CDate('25.10.2022') and MevkiTakip.BitisTarihi>cdate('25.10.2022'))
+WHERE ((([PerUnvanTakip]![BasTarihi])<=CDate('25.10.2022')) AND (([PerUnvanTakip]![BitisTarihi])>CDate('25.10.2022')) AND ((AkaPerCalismaTakip.BolumId)=2) AND ((AkaPerCalismaTakip.IseGirisT)<=CDate('25.10.2022')) AND ((AkaPerCalismaTakip.IstenCikisT)>CDate('25.10.2022')) AND ((PerUnvanTakip.UnvanId)<5))
+) as subQery
+Order By subQery.UyeDurum, Mevkiler.Mevki desc, Unvanlar.Id"
+
+Önceki CDate('25.10.2022')
+Sonraki cdate('" & tarih & "')

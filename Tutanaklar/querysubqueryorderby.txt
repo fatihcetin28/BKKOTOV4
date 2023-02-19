@@ -1,0 +1,24 @@
+"select * from (SELECT Unvanlar.Unvan, AkaPersonel.Ad " & "& ' ' &" & " AkaPersonel.Soyad AS AdSoyad," & _
+" IIf(IsNull([BolumBaskaniTakip]![BaskanPerId]),'Üye','Başkan') AS UyeDurum," & _ 
+" IIf(CDate('" & tarih & "')>=[Izinler].[BasTar] And CDate('" & tarih & "')<[Izinler].[BitisTar],[IzinTurleri].[ImzaTemsili],'') AS IzinDurum," & _
+" Unvanlar.Id, Mevkiler.Mevki," & _
+" IIf(IsNull([VekaletTakip]![VekaletEdenPerId]),"",[Unvanlar]![Unvan] & ' ' & [AkaPersonel]![Ad] " & "& ' ' &" & " [AkaPersonel]![Soyad] & ' ' & [IzinTurleri]![Baskanliginda] & ' olduğundan ' & [Unvanlar_1]![Unvan] & ' ' & [AkaPersonel_1]![Ad] & ' ' & [AkaPersonel_1]![Soyad]) AS Baskanliginda" & _
+" FROM ((((Mevkiler RIGHT JOIN" & _
+" (((IzinTurleri RIGHT JOIN" & _
+" ((Bolumler RIGHT JOIN" & _
+" ((Unvanlar RIGHT JOIN" & _
+" (AkaPersonel LEFT JOIN PerUnvanTakip ON AkaPersonel.Id = PerUnvanTakip.PerId)" & _
+" ON Unvanlar.Id = PerUnvanTakip.UnvanId)" & _
+" LEFT JOIN AkaPerCalismaTakip ON AkaPersonel.Id = AkaPerCalismaTakip.PerId)" & _
+" ON Bolumler.Id = AkaPerCalismaTakip.BolumId)" & _
+" LEFT JOIN Izinler ON (AkaPersonel.Id = Izinler.PerId and Izinler.BasTar<=CDate('" & tarih & "') and Izinler.BitisTar>CDate('" & tarih & "')))" & _
+" ON IzinTurleri.Id = Izinler.TurId)" & _
+" LEFT JOIN BolumBaskaniTakip ON (AkaPersonel.Id = BolumBaskaniTakip.BaskanPerId and BolumBaskaniTakip.BasTarihi<=CDate('" & tarih & "') and BolumBaskaniTakip.BitisTarihi>CDate('" & tarih & "')))" & _
+" LEFT JOIN MevkiTakip ON (AkaPersonel.Id = MevkiTakip.PerId and MevkiTakip.BasTarihi<=CDate('" & tarih & "') and MevkiTakip.BitisTarihi>CDate('" & tarih & "')))" & _
+" ON Mevkiler.Id = MevkiTakip.MevkiId)" & _
+" LEFT JOIN VekaletTakip ON Izinler.Id = VekaletTakip.IzinId)" & _
+" LEFT JOIN AkaPersonel AS AkaPersonel_1 ON VekaletTakip.VekaletEdenPerId = AkaPersonel_1.Id)" & _
+" LEFT JOIN PerUnvanTakip AS PerUnvanTakip_1 ON VekaletTakip.VekaletEdenPerId = PerUnvanTakip_1.PerId)" & _
+" LEFT JOIN Unvanlar AS Unvanlar_1 ON (PerUnvanTakip_1.UnvanId = Unvanlar_1.Id and PerUnvanTakip_1.BasTarihi<=CDate('" & tarih & "') and PerUnvanTakip_1.BitisTarihi>CDate('" & tarih & "'))" & _
+" WHERE (((Unvanlar.Id)<5) AND (([PerUnvanTakip]![BasTarihi])<=CDate('" & tarih & "')) AND (([PerUnvanTakip]![BitisTarihi])>CDate('" & tarih & "'))" & _
+" AND ((AkaPerCalismaTakip.BolumId)=" & bolumId & ") AND ((AkaPerCalismaTakip.IseGirisT)<=CDate('" & tarih & "')) AND ((AkaPerCalismaTakip.IstenCikisT)>CDate('" & tarih & "')))) as subQuery Order By subQuery.UyeDurum, Mevkiler.Mevki desc, Unvanlar.Id"

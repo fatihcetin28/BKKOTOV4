@@ -1,0 +1,25 @@
+SELECT 
+Unvanlar.Unvan, AkaPersonel.Ad & ' ' & AkaPersonel.Soyad AS AdSoyad, 
+IIf(IsNull([BolumBaskaniTakip]![BaskanPerId]),'Üye','Başkan') AS UyeDurum, 
+IIf(CDate('25.10.2022')>=[Izinler].[BasTar] And CDate('25.10.2022')<[Izinler].[BitisTar],[IzinTurleri].[ImzaTemsili],'') AS IzinDurum, 
+Unvanlar.Id, Mevkiler.Mevki, 
+IIf(IsNull([VekaletTakip]![VekaletEdenPerId]),"",[Unvanlar]![Unvan] & ' ' & [AkaPersonel]![Ad] & ' ' & [AkaPersonel]![Soyad] & ' ' & [IzinTurleri]![Baskanliginda] & ' olduğundan ' & [Unvanlar_1]![Unvan] & ' ' & [AkaPersonel_1]![Ad] & ' ' & [AkaPersonel_1]![Soyad]) AS Baskanliginda
+FROM 
+((((Mevkiler RIGHT JOIN 
+(((IzinTurleri RIGHT JOIN 
+((Bolumler RIGHT JOIN 
+((Unvanlar RIGHT JOIN 
+(AkaPersonel LEFT JOIN PerUnvanTakip ON AkaPersonel.Id = PerUnvanTakip.PerId) 
+ON Unvanlar.Id = PerUnvanTakip.UnvanId) 
+LEFT JOIN AkaPerCalismaTakip ON AkaPersonel.Id = AkaPerCalismaTakip.PerId) 
+ON Bolumler.Id = AkaPerCalismaTakip.BolumId) 
+LEFT JOIN Izinler ON (AkaPersonel.Id = Izinler.PerId and Izinler.BasTar<=CDate('25.10.2022') and Izinler.BitisTar>CDate('25.10.2022'))) 
+ON IzinTurleri.Id = Izinler.TurId) 
+LEFT JOIN BolumBaskaniTakip ON (AkaPersonel.Id = BolumBaskaniTakip.BaskanPerId and BolumBaskaniTakip.BasTarihi<=CDate('25.10.2022') and BolumBaskaniTakip.BitisTarihi>CDate('25.10.2022'))) 
+LEFT JOIN MevkiTakip ON (AkaPersonel.Id = MevkiTakip.PerId and MevkiTakip.BasTarihi<=CDate('25.10.2022') and MevkiTakip.BasTarihi>CDate('25.10.2022'))) 
+ON Mevkiler.Id = MevkiTakip.MevkiId) 
+LEFT JOIN VekaletTakip ON Izinler.Id = VekaletTakip.IzinId) 
+LEFT JOIN AkaPersonel AS AkaPersonel_1 ON VekaletTakip.VekaletEdenPerId = AkaPersonel_1.Id) 
+LEFT JOIN PerUnvanTakip AS PerUnvanTakip_1 ON VekaletTakip.VekaletEdenPerId = PerUnvanTakip_1.PerId)
+LEFT JOIN Unvanlar AS Unvanlar_1 ON (PerUnvanTakip_1.UnvanId = Unvanlar_1.Id and PerUnvanTakip_1.BasTarihi<=CDate('25.10.2022') and PerUnvanTakip_1.BitisTarihi>CDate('25.10.2022'))
+WHERE (((Unvanlar.Id)<5) AND (([PerUnvanTakip]![BasTarihi])<=CDate('25.10.2022')) AND (([PerUnvanTakip]![BitisTarihi])>CDate('25.10.2022')) AND ((AkaPerCalismaTakip.BolumId)=1) AND ((AkaPerCalismaTakip.IseGirisT)<=CDate('25.10.2022')) AND ((AkaPerCalismaTakip.IstenCikisT)>CDate('25.10.2022')));
